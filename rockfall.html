@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Falling Animation</title>
+    <style>
+        #canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+
+    <script>
+        // Identify the canvas and context
+        let canvas = document.getElementById("canvas");
+        let context = canvas.getContext("2d");
+
+        // Set initial values
+        let time = 0;
+        let timeIncrement = 0.1; // smaller increments will make the animation smoother
+        let initialHeight = 300; // in pixels, can be adjusted
+        let g = 9.81; // gravitational constant
+
+        // Rock object
+        let rock = {
+            x: canvas.width / 2,
+            y: initialHeight,
+            radius: 20,
+            draw: function() {
+                context.beginPath();
+                context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                context.fillStyle = "gray";
+                context.fill();
+                context.closePath();
+            }
+        };
+
+        // Animation function
+        function animate() {
+            // Clear canvas for new frame
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw rock
+            rock.draw();
+
+            // Apply the physics
+            rock.y = initialHeight + 0.5 * g * Math.pow(time, 2);
+
+            // Increment time
+            time += timeIncrement;
+
+            // Request next frame
+            requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>
