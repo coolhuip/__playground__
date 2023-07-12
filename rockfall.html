@@ -12,50 +12,65 @@
     <canvas id="canvas" width="800" height="600"></canvas>
 
     <script>
-        // Identify the canvas and context
-        let canvas = document.getElementById("canvas");
-        let context = canvas.getContext("2d");
+    // Identify the canvas and context
+    let canvas = document.getElementById("canvas");
+    let context = canvas.getContext("2d");
 
-        // Set initial values
-        let time = 0;
-        let timeIncrement = 0.1; // smaller increments will make the animation smoother
-        let initialHeight = 300; // in pixels, can be adjusted
-        let g = 9.81; // gravitational constant
+    // Set initial values
+    let frame = 0;
+    let initialHeight = 300; // in pixels, can be adjusted
 
-        // Rock object
-        let rock = {
-            x: canvas.width / 2,
-            y: initialHeight,
-            radius: 20,
-            draw: function() {
-                context.beginPath();
-                context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-                context.fillStyle = "gray";
-                context.fill();
-                context.closePath();
-            }
-        };
+    // Conversion factors
+    let verticalScale = 200; // pixels per meter
+    let timeScale = 60; // frames per second
 
-        // Animation function
-        function animate() {
-            // Clear canvas for new frame
-            context.clearRect(0, 0, canvas.width, canvas.height);
+    // Physics constants
+    let g = 9.81 * verticalScale / timeScale / timeScale; // gravitational constant, in pixels per frame squared
 
-            // Draw rock
-            rock.draw();
+    // Rock object
+    let rock = {
+        x: canvas.width / 2,
+        y: initialHeight,
+        radius: 20,
+        vy: 0, // vertical velocity
+        bounciness: 0.7, // determines how much the rock will bounce
+        draw: function() {
+            context.beginPath();
+            context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            context.fillStyle = "gray";
+            context.fill();
+            context.closePath();
+        }
+    };
 
-            // Apply the physics
-            rock.y = initialHeight + 0.5 * g * Math.pow(time, 2);
+    // Animation function
+    function animate() {
+        // Clear canvas for new frame
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Increment time
-            time += timeIncrement;
+        // Draw rock
+        rock.draw();
 
-            // Request next frame
-            requestAnimationFrame(animate);
+        // Apply the physics
+        rock.vy = g * frame; // velocity
+        rock.y += rock.vy;
+
+        // Check for ground
+        if (rock.y + rock.radius > canvas.height) {
+            rock.y = canvas.height - rock.radius; // correct position
+            rock.vy = -rock.vy * rock.bounciness; // reverse and reduce velocity
+            frame = 0; // reset frame count
+        } else {
+            frame++; // increment frame only when the rock is not hitting the ground
         }
 
-        // Start animation
-        animate();
+        // Request next frame
+        requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    animate();
+
     </script>
 </body>
 </html>
